@@ -12,6 +12,7 @@ typedef struct node {
 
 int initializeBST(Node** h);
 int freeBST(Node* head); /* free all memories allocated to the tree */
+void freeNode(Node* ptr);
 
 void inorderTraversal(Node* ptr);	  /* recursive inorder traversal */
 void preorderTraversal(Node* ptr);    /* recursive preorder traversal */
@@ -153,12 +154,92 @@ void postorderTraversal(Node* ptr)
 
 int insert(Node* head, int key)
 {
+	//insert할 트리 노드 메모리 할당
+	Node* newNode = (Node*)malloc(sizeof(Node));
+	newNode->key = key;
+	newNode->left = NULL;
+	newNode->right = NULL;
 
+	//root가 NULL일 때 즉 아무 노드도 없을 때
+	if (head->left == NULL) {
+		head->left = newNode;
+		return 1;
+	}
+
+	/* head->left is the root */
+	Node* ptr = head->left;
+
+	Node* parentNode = NULL;
+	while(ptr != NULL) {
+
+		/* 이미 그 키값의 노드가 존재하면 종료 */
+		if(ptr->key == key) return 1;
+
+		/* we have to move onto children nodes,
+		 * keep tracking the parent using parentNode */
+		parentNode = ptr;
+
+		/*키값을 비교하여 기존 노드보다 크면 오른쪽 작으면 왼쪽 노드로 이동*/
+		if(ptr->key < key)
+			ptr = ptr->right;
+		else
+			ptr = ptr->left;
+	}
+
+	/* 새로운 노드와 기존 부모 노드 link */
+	if(parentNode->key > key)
+		parentNode->left = newNode;
+	else
+		parentNode->right = newNode;
+	return 1;
 }
 
 int deleteLeafNode(Node* head, int key)
 {
+	//head가 아예 초기화가 안 되었거나
+	if (head == NULL) {
+		printf("\n Nothing to delete!!\n");
+		return -1;
+	}
+	//root가 NULL 즉 아무 노드도 없을 때
+	if (head->left == NULL) {
+		printf("\n Nothing to delete!!\n");
+		return -1;
+	}
 
+	/* head->left is the root */
+	Node* ptr = head->left;
+	Node* parentNode = head;
+
+	//ptr이 NULL이 아닐 때까지 반복
+	while(ptr != NULL) {
+
+		if(ptr->key == key) {
+			if(ptr->left == NULL && ptr->right == NULL) {
+
+				/* 삭제하고자 하는 노드가 root일 때 */
+				if(parentNode == head)
+					head->left = NULL;
+
+				/* left node case or right case*/
+				if(parentNode->left == ptr)
+					parentNode->left = NULL;
+				else
+					parentNode->right = NULL;
+
+				free(ptr);	//노드 삭제
+			}
+			//못 찾은 경우
+			else {
+				printf("the node [%d] is not a leaf \n", ptr->key);
+			}
+			return 1;
+		}
+
+		/* keep the parent node */
+		parentNode = ptr;
+
+	}
 }
 
 Node* searchRecursive(Node* ptr, int key)

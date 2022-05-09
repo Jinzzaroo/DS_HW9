@@ -242,13 +242,38 @@ int deleteLeafNode(Node* head, int key)
 	}
 }
 
+//recursive 방식으로 search
 Node* searchRecursive(Node* ptr, int key)
 {
+	if(ptr == NULL)
+		return NULL;
 
+	if(ptr->key < key)
+		ptr = searchRecursive(ptr->right, key);
+	else if(ptr->key > key)
+		ptr = searchRecursive(ptr->left, key);
+
+	/* recursive가 끝나면 최종적으로 ptr->key == key */
+	return ptr;
 }
+
 Node* searchIterative(Node* head, int key)
 {
+	/* root node */
+	Node* ptr = head->left;
 
+	//ptr이 NULL이 아닐 때까지 반복
+	while(ptr != NULL)
+	{
+		if(ptr->key == key)
+			return ptr;
+
+		if(ptr->key < key) ptr = ptr->right;
+		else
+			ptr = ptr->left;
+	}
+
+	return NULL;
 }
 
 void freeNode(Node* ptr)
